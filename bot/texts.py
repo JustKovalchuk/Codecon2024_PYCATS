@@ -1,3 +1,5 @@
 ACCOMMODATION = "Знайти житло"
 VOLUNTEER = "Волонтерство"
 QA = "Часті запитання"
+BACK_BUTTON = "Назад"
+NEXT_BUTTON = "Далі"
