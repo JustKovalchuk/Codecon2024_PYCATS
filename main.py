@@ -7,8 +7,8 @@ from db.volunteer_table import VolunteerModel
 from configparser import ConfigParser
 
 from datetime import datetime
-from Parsing.ParseDopomogaModul import get_events as ge
-from Parsing.platforma_volunteer import get_events
+from Parsing.platforma_volunteer import get_all_volunteers
+from Parsing.Prykhystok import get_accommodations
 
 from bot.misc import main
 
@@ -23,5 +23,12 @@ database = config["DB"]["database"]
 set_con(create_connection(server, user, password, database))
 
 if __name__ == "__main__":
+    # events = get_all_volunteers()
+    # for event in events:
+    #     event.save_to_sql()
+    accommodations = get_accommodations()
+    for accommodation in accommodations:
+        accommodation.save_to_sql()
+
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     asyncio.run(main())
