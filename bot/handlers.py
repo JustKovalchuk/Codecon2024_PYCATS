@@ -2,74 +2,66 @@ from aiogram import Router, types
 from aiogram.filters import Command
 from aiogram.types import Message
 from aiogram.filters.callback_data import CallbackData
-from aiogram.utils.keyboard import InlineKeyboardBuilder, InlineKeyboardButton, ReplyKeyboardBuilder, KeyboardButton
+from aiogram.fsm.context import FSMContext
 from aiogram.types.reply_keyboard_remove import ReplyKeyboardRemove
+from aiogram.enums import ParseMode
 
 import bot.menu as menu
 import bot.texts as texts
+import bot.filters as filters
+import bot.states as states
+from bot.callbacks import QACallback
 
+from questions import questions_list, get_question_by_id
 
 router = Router()
 
 
-# як додати обробник власної команди
-@router.message(Command("test_command"))
-async def my_command_handler(message: Message) -> None:
-    await message.answer("/test_command executed!")
+class RegionCallback(CallbackData, prefix="region"):
+    region: str
 
 
-# приклад створення inline menu
-@router.message(Command("inline_menu_command"))
-async def inline_menu_command_handler(message: Message) -> None:
-    buttons = [
-        [InlineKeyboardButton(text="Inline 1", callback_data=InlineButton1CallbackData(id=1).pack()),
-         InlineKeyboardButton(text="Inline 2", callback_data=InlineButton1CallbackData(id=2).pack())],
-        [InlineKeyboardButton(text="Inline 3", callback_data=InlineButton1CallbackData(id=3).pack())],
-    ]
-    builder = InlineKeyboardBuilder(buttons)
-    # builder = builder.adjust(1) # якщо хочеш перезадати максимальну кількість кнопок в 1 рядку
-    await message.answer("/inline_menu_command executed!", reply_markup=builder.as_markup())
+class VolunteerRegionCallback(RegionCallback, prefix="volunteer_region"):
+    pass
 
 
-# приклад створення callback-у для inline кнопок
-class InlineButton1CallbackData(CallbackData, prefix="inline_button"):
-    id: int # параметрів можна й не додавати. Тоді замість цього рядка пишуть pass
+class AccommodationRegionCallback(RegionCallback, prefix="accommodation_region"):
+    pass
 
 
-# приклад обробки натискання inline кнопок
-@router.callback_query(InlineButton1CallbackData.filter())
-async def inline_button1_handler(callback: types.CallbackQuery, callback_data: InlineButton1CallbackData) -> None:
-    await callback.message.answer(f"Inline button {callback_data.id} pressed!")
-    await callback.answer("") # для прибирання затримки в кнопці
+@router.message(filters.AccommodationFilter())
+async def accommodation_handler(message: Message, state: FSMContext) -> None:
+    await state.set_state(states.Form.accommodation)
+    await message.answer("Оберіть область для житла", reply_markup=menu.get_region_markup(AccommodationRegionCallback))
 
 
-@router.message(Command("reply_menu_command"))
-async def reply_menu_command_handler(message: Message) -> None:
-    buttons = [
-        [KeyboardButton(text="Reply 1"),
-         KeyboardButton(text="Reply 2")],
-        [KeyboardButton(text="Reply 3")],
-    ]
-    builder = ReplyKeyboardBuilder(buttons)
-    # builder = builder.adjust(1) # якщо хочеш перезадати максимальну кількість кнопок в 1 рядку
-
-    # приклад створення reply menu (from markup) (так можна створювати і inline menu)
-    # markup = menu.reply_markup
-    # приклад створення reply menu (builder)
-    markup = builder.as_markup()
-
-    await message.answer("/reply_menu_command executed!", reply_markup=markup)
+@router.message(filters.VolunteerFilter())
+async def volunteer_handler(message: Message, state: FSMContext) -> None:
+    await state.set_state(states.Form.volunteer)
+    await message.answer("Оберіть область для волонтерства", reply_markup=menu.get_region_markup(VolunteerRegionCallback))
 
 
-# приклад опрацювання reply markup
-@router.message()
-async def main_handler(message: Message) -> None:
-    if message.text == texts.REPLY_BUTTON_1_TEXT:
-        await message.answer("Answer for reply button 1")
-    elif message.text == texts.REPLY_BUTTON_2_TEXT:
-        await message.answer("Answer for reply button 2")
-    elif message.text == texts.REPLY_BUTTON_3_TEXT:
-        # приклад видалення reply markup
-        await message.answer("Answer for reply button 3", reply_markup=ReplyKeyboardRemove())
-    else:
-        await message.answer("Did not understand your command! Try again!")
+@router.message(filters.QaFilter())
+async def qa_handler(message: Message, state: FSMContext) -> None:
+    await state.set_state(states.Form.qa)
+    await message.answer("Оберіть одне з питань:", reply_markup=menu.get_qa_markup())
+
+
+@router.callback_query(VolunteerRegionCallback.filter())
+async def volunteer_region_handler(callback: types.CallbackQuery, callback_data: VolunteerRegionCallback) -> None:
+    await callback.message.edit_text(f"Знадено наступні волонтерські діяльності за область {callback_data.region}:")
+    await callback.message.edit_reply_markup(reply_markup=ReplyKeyboardRemove())
+
+
+@router.callback_query(AccommodationRegionCallback.filter())
+async def volunteer_region_handler(callback: types.CallbackQuery, callback_data: VolunteerRegionCallback) -> None:
+    await callback.message.answer(f"Обрано регіон {callback_data.region} для житла", reply_markup=menu.main_menu)
+    await callback.message.edit_reply_markup(reply_markup=ReplyKeyboardRemove())
+
+
+@router.callback_query(QACallback.filter())
+async def qa_callback_handler(callback: types.CallbackQuery, callback_data: QACallback) -> None:
+    q = get_question_by_id(callback_data.id)
+    await callback.message.answer(f"<b>{q.question}</b>:\n\n"
+                                  f"{q.answer}", parse_mode=ParseMode.HTML)
+
