@@ -10,7 +10,6 @@ from Parsing.platforma_volunteer import Event
 
 def get_events():
     parse_category = ["Армія", "Переселенці"]
-
     url = "https://volonter.org/dopomoga-volonterski-proekty"
     driver = webdriver.Chrome()
     driver.maximize_window()

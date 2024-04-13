@@ -27,3 +27,13 @@ class VolunteerModel(BaseModel):
             session.commit()
         except Exception as e:
             print("cant insert")
+
+    @staticmethod
+    def find_by_location(name):
+        data = get_session().query(VolunteerModel).filter(VolunteerModel.region.like(f'%{name}%')).all()
+        return data
+
+    @staticmethod
+    def get_all():
+        session = get_session()
+        return session.query(VolunteerModel).all()

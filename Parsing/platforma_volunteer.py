@@ -23,48 +23,57 @@ class Event:
         return [self.name, self.date, self.organiser, self.location, self.link]
 
 
-def get_events(location):
-    events_ = []
-    base_url = 'https://platforma.volunteer.country'
-    event_url = base_url + f"/events?keywords={location}"
+def get_events():
+    events = []
+    base_url = "https://platforma.volunteer.country/events?filtered_categories%5B%5D=19&filtered_categories%5B%5D=33&filtered_categories%5B%5D=21&keywords=&page={}"
 
-    response = requests.get(event_url)
+    i = 1
+    while True:
+        event_url = base_url.format(i)
 
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.content, 'html.parser')
+        response = requests.get(event_url)
 
-        divs = soup.find_all('div', class_='events--card--content')
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.content, 'html.parser')
 
-        for div in divs:
-            event_name = div.find('div', class_='events--card--title').find('h2').text.strip()
-            event_link = base_url + div.find('div', class_='events--card--title').find('a').get('href')
+            divs = soup.find_all('div', class_='events--card--content')
+            if len(divs) == 0:
+                break
+            for div in divs:
+                event_name = div.find('div', class_='events--card--title').find('h2').text.strip()
+                event_link = base_url + div.find('div', class_='events--card--title').find('a').get('href')
 
-            event_date_str = div.find('div', class_='events--card--date-location-wrapper').find('div',
-                                                                                                class_='events--card--date').text.strip()
+                event_date_str = div.find('div', class_='events--card--date-location-wrapper').find('div',
+                                                                                                    class_='events--card--date').text.strip()
 
-            match = re.search(r'\d{4}', event_date_str[::-1])
-            year_index = len(event_date_str) - match.end()
-            event_date = event_date_str[:year_index + 4]
+                match = re.search(r'\d{4}', event_date_str[::-1])
+                year_index = len(event_date_str) - match.end()
+                event_date = event_date_str[:year_index + 4]
+                ev_location = div.find('div', class_='events--card--date-location-wrapper').find('div',
+                                                                                                 class_='events--card--location tippy').text.strip()
+                organiser_element = div.find('div', class_='organization--lettermark--wrapper sm')
+                ev_organiser = None
+                if organiser_element.find('a'):
+                    ev_organiser = organiser_element.find('a').find('div').find('div',
+                                                                                class_='organization--lettermark--name sm').text.strip()
 
-            ev_location = div.find('div', class_='events--card--date-location-wrapper').find('div',
-                                                                                             class_='events--card--location tippy').text.strip()
-            organiser_element = div.find('div', class_='organization--lettermark--wrapper sm')
-            if organiser_element.find('a'):
-                ev_organiser = organiser_element.find('a').find('div').find('div',
-                                                                            class_='organization--lettermark--name sm').text.strip()
+                _event = Event(name=event_name, date=event_date, location=ev_location, organiser=ev_organiser, link=event_link)
+                events.append(_event)
+        else:
+            print(f"Failed to retrieve data from {event_url}")
+            break
+        i += 1
 
-            _event = Event(name=event_name, date=event_date, location=location, organiser=ev_organiser, link=event_link)
-            events_.append(_event)
-
-        return events_
-    else:
-        print(f"Failed to retrieve data from {event_url}")
-        return None
+    return events
 
 
 if __name__ == '__main__':
-    event_location = input("Enter the location (e.g., Lviv): ")
-    events = get_events(location=event_location)
+    events = get_events()
+    s = []
+    print(len(events))
     for event in events:
-        event.save_to_sql()
-        event.print()
+        s.append(event.location)
+
+    s = list(set(s))
+    print(s)
+    print(len(s))

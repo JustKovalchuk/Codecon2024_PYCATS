@@ -28,3 +28,13 @@ class AccommodationModel(BaseModel):
         session = get_session()
         session.add(self)
         session.commit()
+
+    def delete(self):
+        session = get_session()
+        session.delete(self)
+        session.commit()
+
+    @staticmethod
+    def find_by_location(name):
+        data = get_session().query(AccommodationModel).filter(AccommodationModel.region.like(f'%{name}%')).all()
+        return data
