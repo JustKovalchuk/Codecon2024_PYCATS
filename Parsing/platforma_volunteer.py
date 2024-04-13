@@ -1,5 +1,6 @@
 import re
 
+from db.volunteer_table import VolunteerModel
 import requests
 from bs4 import BeautifulSoup
 
@@ -13,7 +14,11 @@ class Event:
         self.location = location
         self.link = link
 
-    def show(self):
+    def save_to_sql(self):
+        VolunteerModel(self.name, self.date, self.organiser, self.location, self.link).insert()
+
+    def print(self):
+        print(self.name, self.date, self.organiser, self.location, self.link)
         return [self.name, self.date, self.organiser, self.location, self.link]
 
 
@@ -47,7 +52,6 @@ def get_events(location):
                 ev_organiser = organiser_element.find('a').find('div').find('div',
                                                                          class_='organization--lettermark--name sm').text.strip()
 
-            print(event_name, event_date, ev_organiser, ev_location, event_link)
             _event = Event(name=event_name, date=event_date, location=location, organiser=ev_organiser, link=event_link)
             events_.append(_event)
 
@@ -57,7 +61,9 @@ def get_events(location):
         return None
 
 
-event_location = input("Enter the location (e.g., Lviv): ")
-events = get_events(location=event_location)
-for event in events:
-    event.show()
+if __name__ == '__main__':
+    event_location = input("Enter the location (e.g., Lviv): ")
+    events = get_events(location=event_location)
+    for event in events:
+        event.save_to_sql()
+        event.print()
