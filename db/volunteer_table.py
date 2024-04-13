@@ -26,4 +26,4 @@ class VolunteerModel(BaseModel):
             session.add(self)
             session.commit()
         except Exception as e:
-            print("cant insert", e)
+            print("cant insert")

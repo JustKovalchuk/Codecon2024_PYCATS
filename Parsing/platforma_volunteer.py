@@ -1,8 +1,9 @@
 import re
 
-from db.volunteer_table import VolunteerModel
 import requests
 from bs4 import BeautifulSoup
+
+from db.volunteer_table import VolunteerModel
 
 
 class Event:
@@ -46,11 +47,11 @@ def get_events(location):
             event_date = event_date_str[:year_index + 4]
 
             ev_location = div.find('div', class_='events--card--date-location-wrapper').find('div',
-                                                                                          class_='events--card--location tippy').text.strip()
+                                                                                             class_='events--card--location tippy').text.strip()
             organiser_element = div.find('div', class_='organization--lettermark--wrapper sm')
             if organiser_element.find('a'):
                 ev_organiser = organiser_element.find('a').find('div').find('div',
-                                                                         class_='organization--lettermark--name sm').text.strip()
+                                                                            class_='organization--lettermark--name sm').text.strip()
 
             _event = Event(name=event_name, date=event_date, location=location, organiser=ev_organiser, link=event_link)
             events_.append(_event)
