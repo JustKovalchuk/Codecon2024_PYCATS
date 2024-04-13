@@ -31,3 +31,7 @@ class AccommodationModel(BaseModel):
     def find_by_location(name):
         data = get_session().query(AccommodationModel).filter(AccommodationModel.region.like(f'%{name}%')).all()
         return data
+
+    @staticmethod
+    def close_session():
+        get_session().close()

@@ -37,3 +37,7 @@ class VolunteerModel(BaseModel):
     def get_all():
         session = get_session()
         return session.query(VolunteerModel).all()
+
+    @staticmethod
+    def close_session():
+        get_session().close()

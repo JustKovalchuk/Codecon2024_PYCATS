@@ -127,10 +127,6 @@ def get_events_from_volunteer_org():
     return info_results
 
 
-def get_all_volunteers():
-    return get_events_platform_volunteer() + get_events_from_volunteer_org()
-
-
 if __name__ == '__main__':
     events = get_events_platform_volunteer()
     s = []

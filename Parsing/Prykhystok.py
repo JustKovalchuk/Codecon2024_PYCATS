@@ -34,8 +34,8 @@ class Residence:
         return
 
 
-def get_accommodations():
-    return get_accommodation_prykhystok()
+# def get_accommodations():
+#     return get_accommodation_prykhystok()
 
 
 def get_accommodation_prykhystok():
