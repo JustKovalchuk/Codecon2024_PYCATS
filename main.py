@@ -9,7 +9,7 @@ from configparser import ConfigParser
 
 from datetime import datetime
 
-from Parsing import platforma_volunteer, prykhystok, parse_dopomagai_modul
+from parsing import platforma_volunteer, prykhystok, parse_dopomagai_modul
 
 from bot.misc import main
 
