@@ -55,3 +55,7 @@ class RegionModel(BaseModel):
         session = get_session()
         session.add(self)
         session.commit()
+
+    @staticmethod
+    def close_session():
+        get_session().close()

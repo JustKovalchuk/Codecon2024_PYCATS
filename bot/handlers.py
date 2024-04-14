@@ -11,7 +11,8 @@ import bot.menu as menu
 import bot.texts as texts
 import bot.filters as filters
 import bot.states as states
-from bot.callbacks import QACallback
+from bot.utils import ListView, print_list, ListType, get_listview, save_listview
+from bot.callbacks import QACallback, FullListPrint, ListMovementCallbackData
 
 from db.volunteer_table import VolunteerModel
 from db.accommodation_table import AccommodationModel
@@ -42,25 +43,8 @@ async def accommodation_handler(message: Message, state: FSMContext) -> None:
 @router.message(states.Form.accommodation)
 async def accommodation_city_search_handler(message: Message, state: FSMContext) -> None:
     accommodation_list = AccommodationModel.find_by_location(message.text)
-    index = 0
-    if len(accommodation_list) == 0:
-        await message.answer("Житла не знайдено")
-    else:
-        for accommodation in accommodation_list:
-            index += 1
-            content = as_list(
-                as_marked_section(
-                    Text(Bold(f"{index}"), ". ", Bold(accommodation.name), ":"),
-                    Text(Bold("Локація"), f": {accommodation.region}"),
-                    Text(Bold("Дата"), f": {accommodation.date}"),
-                    Text(Bold("Кого приймають"), f": {accommodation.accepted}"),
-                    Text(Bold("На який термін"), f": {accommodation.term}"),
-                    Text(Bold("Тип розміщення"), f": {accommodation.accommodation_type}\n"
-                                                 f"\nПовна інформація за посиланням -> {accommodation.url}"),
-                    marker="   🔸 ",
-                ),
-            )
-            await message.answer(**content.as_kwargs())
+    lv = ListView(accommodation_list, start_text="Список житла за вашим запитом:\n", empty_data_text="Житла не знайдено")
+    await print_list(message, lv, ListType.ACCOMMODATION)
     await state.clear()
 
 
@@ -74,23 +58,9 @@ async def volunteer_handler(message: Message, state: FSMContext) -> None:
 @router.message(states.Form.volunteer)
 async def volunteer_city_search_handler(message: Message, state: FSMContext) -> None:
     volunteer_list = VolunteerModel.find_by_location(message.text)
-    index = 0
-    if len(volunteer_list) == 0:
-        await message.answer("Подій не знайдено")
-    else:
-        for volunteer in volunteer_list:
-            index += 1
-            content = as_list(
-                as_marked_section(
-                    Text(Bold(f"{index}"), ". ", Bold(volunteer.name), ":"),
-                    Text(Bold("Локація"), f": {volunteer.region}"),
-                    Text(Bold("Дата"), f": {volunteer.date}"),
-                    Text(Bold("Організатор"), f": {volunteer.organizer}\n"
-                                              f"\nПовна інформація за посиланням -> {volunteer.url}"),
-                    marker="   🔸 ",
-                ),
-            )
-            await message.answer(**content.as_kwargs())
+    lv = ListView(volunteer_list, start_text="Список волонтерських діяльностей за вашим запитом:\n",
+                  empty_data_text="Волонтерськихіяльностей не знайдено")
+    await print_list(message, lv, ListType.ACCOMMODATION)
     await state.clear()
 
 
@@ -123,3 +93,23 @@ async def qa_callback_handler(callback: types.CallbackQuery, callback_data: QACa
     await callback.message.answer(f"<b>{q.question}</b>:\n\n"
                                   f"{q.answer}", parse_mode=ParseMode.HTML)
 
+
+@router.callback_query(ListMovementCallbackData.filter())
+async def list_movement_handler(callback: types.CallbackQuery, callback_data: ListMovementCallbackData) -> None:
+    lv = get_listview(callback_data.tg_user_id)
+
+    if callback_data.next:
+        lv.next()
+    else:
+        lv.previous()
+
+    save_listview(callback_data.tg_user_id, lv)
+    await print_list(callback.message, lv, callback_data.list_type)
+
+
+@router.callback_query(FullListPrint.filter())
+async def list_movement_handler(callback: types.CallbackQuery, callback_data: FullListPrint) -> None:
+    id = callback_data.id
+    lv: ListView = get_listview(callback.from_user.id)
+    data, indexes = lv.slice_data()
+    await callback.message.answer(data[id].full_string(indexes[id]), parse_mode=ParseMode.HTML)
