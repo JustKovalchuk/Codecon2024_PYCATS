@@ -27,7 +27,7 @@ def set_con(con):
 def create_connection(hostname, username, password, database_name):
     global engine, Session, session
     try:
-        str = f"mysql+mysqlconnector://{username}:{password}@{hostname}/{database_name}"
+        str = f"mysql+mysqlconnector://{username}:{password}@{hostname}/{database_name}?charset=utf8mb4"
         if not database_exists(str):
             create_database(str)
         engine = create_engine(str)

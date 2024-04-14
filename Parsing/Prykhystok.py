@@ -26,16 +26,12 @@ class Residence:
 
     def save_to_sql(self):
         try:
-            AccommodationModel(self.date, self.description, self.address, str(self.settlers), str(self.terms), str(self.types_of_residence), self.link).insert()
+            AccommodationModel(self.date, self.description, self.address, str(self.settlers), str(self.terms), str(self.types_of_residence), self.number_of_places, self.link).insert()
         except Exception as e:
             print(e)
 
     def show(self):
         return
-
-
-# def get_accommodations():
-#     return get_accommodation_prykhystok()
 
 
 def get_accommodation_prykhystok():
@@ -109,7 +105,7 @@ def get_accommodation_prykhystok():
         old_count = len(driver.find_elements(By.XPATH,
                                              "/html/body/div[1]/div[2]/div[2]/div/div/div[2]/div[1]/div/div/div[2]/*/div[1]"))
         cnt = 0
-        while cnt < 10:
+        while cnt < 30:
             cnt += 1
             # Move the cursor to the element and click on it
             button = driver.find_elements(By.XPATH, "//button[contains(text(), 'Завантажити ще')]")[0]
