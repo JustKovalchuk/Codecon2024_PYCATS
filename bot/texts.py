@@ -1,5 +1,6 @@
 ACCOMMODATION = "Знайти житло🏠"
-VOLUNTEER = "Волонтерство"
+VOLUNTEER = "Волонтерство🆘"
 QA = "Часті запитання❓"
+DONATE = "Донати💵"
 BACK_BUTTON = "⬅️Назад"
 NEXT_BUTTON = "Далі➡️"

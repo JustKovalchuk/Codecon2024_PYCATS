@@ -17,3 +17,8 @@ class VolunteerFilter(Filter):
 class QaFilter(Filter):
     async def __call__(self, message: Message):
         return message.text.lower() == texts.QA.lower()
+
+
+class DONATEFilter(Filter):
+    async def __call__(self, message: Message):
+        return message.text.lower() == texts.DONATE.lower()

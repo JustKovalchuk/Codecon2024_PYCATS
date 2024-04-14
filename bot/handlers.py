@@ -11,8 +11,10 @@ import bot.menu as menu
 import bot.texts as texts
 import bot.filters as filters
 import bot.states as states
+from bot.DonateModul import get_names_in_ids, get_donate_struct_by_id, DonateStruc, get_Donate_info
 from bot.utils import ListView, print_list, ListType, get_listview, save_listview
-from bot.callbacks import QACallback, FullListPrint, ListMovementCallbackData
+from bot.callbacks import QACallback, FullListPrint, ListMovementCallbackData, PrintDonateCallback, DonateGroupCallback, \
+    DonateInGroupNamesCallback
 
 from db.volunteer_table import VolunteerModel
 from db.accommodation_table import AccommodationModel
@@ -43,7 +45,8 @@ async def accommodation_handler(message: Message, state: FSMContext) -> None:
 @router.message(states.Form.accommodation)
 async def accommodation_city_search_handler(message: Message, state: FSMContext) -> None:
     accommodation_list = AccommodationModel.find_by_location(message.text)
-    lv = ListView(accommodation_list, start_text="Список житла за вашим запитом:\n", empty_data_text="На жаль, житла не знайдено🤷‍♀️")
+    lv = ListView(accommodation_list, start_text="Список житла за вашим запитом:\n",
+                  empty_data_text="На жаль, житла не знайдено🤷‍♀️")
     await print_list(message, lv, ListType.ACCOMMODATION)
     await state.clear()
 
@@ -68,6 +71,11 @@ async def volunteer_city_search_handler(message: Message, state: FSMContext) -> 
 async def qa_handler(message: Message, state: FSMContext) -> None:
     await state.set_state(states.Form.qa)
     await message.answer("Оберіть одне з питань:", reply_markup=menu.get_qa_markup())
+
+
+@router.message(filters.DONATEFilter())
+async def volunteer_handler(message: Message, state: FSMContext) -> None:
+    await message.answer("Оберіть категорію::", reply_markup=menu.get_inline_Donate_Groups())
 
 
 @router.callback_query(VolunteerRegionCallback.filter())
@@ -122,3 +130,21 @@ async def list_movement_handler(callback: types.CallbackQuery, callback_data: Fu
     data, indexes = lv.slice_data()
     await callback.message.answer(data[id].full_string(indexes[id]), parse_mode=ParseMode.HTML)
     await callback.answer()
+
+
+@router.callback_query(DonateInGroupNamesCallback.filter())
+async def list_name_in_Group_Handler(callback: types.CallbackQuery, callback_data: DonateInGroupNamesCallback) -> None:
+    await callback.message.answer("Оберіть донат:", reply_markup=menu.get_inline_Donate_In_Group(callback_data.name))
+
+
+@router.callback_query(PrintDonateCallback.filter())
+async def print_donate_handler(callback: types.CallbackQuery, callback_data: PrintDonateCallback) -> None:
+    donate_structs = get_donate_struct_by_id(callback_data.id)
+    txt = donate_structs[0].name
+    don: DonateStruc = None
+    txt += f"\n\n\tРеквізити:\n\n"
+    for don in donate_structs:
+        txt += f"\t{don.info}\n\t{don.transferDetails}\n\n"
+    txt += f"Посилання: {don.link}"
+
+    await callback.message.answer(txt)

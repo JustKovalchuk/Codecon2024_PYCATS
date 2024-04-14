@@ -3,17 +3,20 @@ from aiogram.utils.keyboard import (KeyboardButton, ReplyKeyboardMarkup, InlineK
 
 import bot.texts as texts
 from bot.utils import get_listview, ListType, ListView
-from bot.callbacks import QACallback, ListMovementCallbackData, FullListPrint
+from bot.callbacks import QACallback, ListMovementCallbackData, FullListPrint, PrintDonateCallback,DonateInGroupNamesCallback
 
 from questions import questions_list
 from regions import regions_list
+from bot.DonateModul import *
+
 
 
 main_menu = ReplyKeyboardMarkup(keyboard=[
         [KeyboardButton(text=texts.ACCOMMODATION),
          KeyboardButton(text=texts.VOLUNTEER)],
-        [KeyboardButton(text=texts.QA)],
-    ])
+        [KeyboardButton(text=texts.QA),
+         KeyboardButton(text=texts.DONATE)]
+    ],resize_keyboard=True)
 
 
 def get_region_markup(callback):
@@ -73,3 +76,22 @@ def get_inline_keyboard_markup_for_lists(tg_user_id: int, list_view: ListView, l
     builder_main.attach(builder)
 
     return builder_main.as_markup()
+
+
+def get_inline_Donate_Groups():
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="Гуманітарна", callback_data=DonateInGroupNamesCallback(name="Гуманітарна").pack())],
+        [InlineKeyboardButton(text="На армію", callback_data=DonateInGroupNamesCallback(name="На армію").pack())],
+    ])
+    return keyboard
+
+
+def get_inline_Donate_In_Group(group):
+    tmp=[]
+    names = get_Unique_Name()
+    donation_groups = get_donation_structs_by_group(group)
+    s = {(e.id, e.name) for e in donation_groups}
+    for d in s:
+        tmp.append([InlineKeyboardButton(text=f"{d[1]}", callback_data=PrintDonateCallback(id=d[0]).pack())])
+    keyboard = InlineKeyboardMarkup(inline_keyboard=tmp)
+    return keyboard
