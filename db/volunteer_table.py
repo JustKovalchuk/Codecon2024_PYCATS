@@ -49,14 +49,15 @@ class VolunteerModel(BaseModel):
         #         marker="   🔸 ",
         #     ),
         # )
-        str = (
+        txt = (
             f"{index}. <b>{self.name}</b>:\n"
             f"   🔸 <b>Локація</b>: {self.region}\n"
-            f"   🔸 <b>Дата</b>: {self.date}\n"
-            f"   🔸 <b>Організатор</b>: {self.organizer}\n"
-            f"   🔸 <b>Дата</b>: {self.date}\n\n"
-            f"Повна інформація за посиланням -> {self.url}")
-        return str
+            f"   🔸 <b>Дата</b>: {self.date}"
+            )
+        if self.organizer:
+            txt += f"\n   🔸 <b>Організатор</b>: {self.organizer}"
+        txt += f"\n\nПовна інформація за посиланням 👉 {self.url}"
+        return txt
 
     def insert(self):
         try:

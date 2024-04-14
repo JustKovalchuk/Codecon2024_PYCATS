@@ -32,7 +32,7 @@ def get_qa_markup():
 
     builder = InlineKeyboardBuilder()
     builder.add(*buttons)
-    builder.adjust(2, 2)
+    builder.adjust(1, 1)
 
     return builder.as_markup(resize_keyboard=True)
 

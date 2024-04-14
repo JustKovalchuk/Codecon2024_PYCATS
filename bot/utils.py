@@ -17,7 +17,7 @@ class ListType(Enum):
 
 
 class ListView:
-    def __init__(self, data: list, page_size: int = 10, current_page: int = 0,
+    def __init__(self, data: list, page_size: int = 3, current_page: int = 0,
                  start_text="Список даних:\n", end_text="",
                  empty_data_text="Даних по вашому запиту не знайдено!"):
         self.page_size = page_size
@@ -52,7 +52,7 @@ class ListView:
         return self.slice_data()
 
 
-async def print_list(message: Message, lv: ListView, lt: ListType):
+async def print_list(message: Message, lv: ListView, lt: ListType, edit=False):
     text = ''
     data, index = lv.slice_data()
 
@@ -62,7 +62,16 @@ async def print_list(message: Message, lv: ListView, lt: ListType):
     save_listview(message.from_user.id, lv)
 
     markup = menu.get_inline_keyboard_markup_for_lists(message.from_user.id, lv, lt)
-    await message.answer(lv.start_text + text + lv.end_text, reply_markup=markup, parse_mode=ParseMode.HTML)
+    if len(data) > 0:
+        final_text = lv.start_text + text + lv.end_text
+    else:
+        final_text = lv.empty_data_text
+
+    if edit:
+        await message.edit_text(final_text, parse_mode=ParseMode.HTML)
+        await message.edit_reply_markup(reply_markup=markup)
+    else:
+        await message.answer(final_text, reply_markup=markup, parse_mode=ParseMode.HTML)
 
 
 def save_listview(tg_id, listview: ListView):

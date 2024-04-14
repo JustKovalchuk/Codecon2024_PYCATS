@@ -36,9 +36,9 @@ class AccommodationModel(BaseModel):
             f"    Кількість осіб: {self.number_of_people}\n"
             f"    Локація: {self.region}\n"
             f"    Кого приймають: {d1}\n"
-            f"    На який термін: {d2}\n"
-            f"    Тип розміщення: {d3}\n"
-            f"    Дата: {date}\n")
+            f"    На який термін: {d2}\n")
+        if self.accommodation_type:
+            txt += f"    Тип розміщення: {d3}\n"
         # content = as_list(
         #     as_marked_section(
         #         Text(Bold(f"{index}"), ". ", Bold(self.desc), ":"),
@@ -60,11 +60,14 @@ class AccommodationModel(BaseModel):
             f"   🔸 <b>Опис</b>: {self.desc}\n"
             f"   🔸 <b>Кількість осіб</b>: {self.number_of_people}\n"
             f"   🔸 <b>Локація</b>: {self.region}\n"
-            f"   🔸 <b>Дата</b>: {date}\n"
+            # f"   🔸 <b>Дата</b>: {date}\n"
             f"   🔸 <b>Кого приймають</b>: {d1}\n"
-            f"   🔸 <b>На який термін</b>: {d2}\n"
-            f"   🔸 <b>Тип розміщення</b>: {d3}\n\n"
-            f"Повна інформація за посиланням -> {self.url}")
+            f"   🔸 <b>На який термін</b>: {d2}"
+            )
+
+        if self.accommodation_type:
+            txt += f"\n   🔸 <b>Тип розміщення</b>: {d3}"
+        txt += f"\n\nПовна інформація за посиланням 👉 {self.url}"
         return txt
 
     def insert(self):
