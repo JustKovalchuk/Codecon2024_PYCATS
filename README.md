@@ -1,16 +1,16 @@
 # [VPO HELP BOT](https://t.me/help_vpo_bot)
-### Project for `'Hackathon 4.0'`	### Project for `'Codecon 2024'`
-#### Contacts:	#### Contacts:
-##### Yurasov Volodymyr	##### Yurasov Volodymyr
-* [Telegram](https://t.me/yurasov_volodymyr)	* [Telegram](https://t.me/yurasov_volodymyr)
-* [Git](https://github.com/MusicW0lf)	* [Git](https://github.com/MusicLovingWolf)
-##### Oleksandr Kovalchuk	##### Oleksandr Kovalchuk
-* [Telegram](https://t.me/justsashakovalchuk)	* [Telegram](https://t.me/justsashakovalchuk)
-* [Git](https://github.com/JustKovalchuk)	* [Git](https://github.com/JustKovalchuk)
-##### Oleksandr Zhuk	##### Roman Vasylkovskyi
-* [Telegram](https://t.me/Sasha_Beetle) 	* [Telegram](https://t.me/test_nano) 
-* [Git](https://github.com/SashaBeetle)	* [Git](https://github.com/RomanVasylkovskyi)
-## 🛠️ Stack	## 🛠️ Stack
+Project for `'Codecon 2024'`
+#### Contacts:
+##### Yurasov Volodymyr
+[Telegram](https://t.me/yurasov_volodymyr)
+[Git](https://github.com/MusicLovingWolf)
+##### Oleksandr Kovalchuk
+[Telegram](https://t.me/justsashakovalchuk)
+[Git](https://github.com/JustKovalchuk)
+##### Roman Vasylkovskyi
+[Telegram](https://t.me/test_nano) 
+[Git](https://github.com/RomanVasylkovskyi)
+## 🛠️ Stack
 * [.NET](https://dotnet.microsoft.com/) - free, open-source, cross-platform framework for building modern apps and powerful cloud services.	* [Python](https://www.python.org) - Python is a programming language that lets you work quickly and integrate systems more effectively.
 * [NuGet packages](https://learn.microsoft.com/uk-ua/nuget/) - type of software package used in the Microsoft .NET ecosystem, containing compiled code and other resources, and are used by developers to easily add functionality to their projects and share code between teams.	* [Telegram Bot API](https://core.telegram.org) - This API allows you to connect bots to our system. Telegram Bots are special accounts that do not require an additional phone number to set up. These accounts serve as an interface for code running somewhere on your server.
 * [Unity](https://unity.com/) - multi-platform tool for developing video games and applications, and the engine on which they run.	* [aiogram](https://docs.aiogram.dev/en/latest/#) - aiogram is a modern and fully asynchronous framework for Telegram Bot API written in Python 3.8 using asyncio and aiohttp.
